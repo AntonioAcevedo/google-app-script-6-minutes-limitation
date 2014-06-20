@@ -1,9 +1,61 @@
 function doGet() 
 {
+    var titleLabel, checkboxNameLabel, checkboxSurnamesLabel, checkboxEmailsLabel, checkboxPhonesLabel, checkboxAddressesLabel, checkboxGroupsLabel, checkboxNotesLabel, checkboxPositionLabel, checkboxCompaniesLabel, tableGroupsLabel;
+    var originAccountLabel, processDescriptionLabel, processDescriptionStep1Label, processDescriptionStep2Label, processDescriptionStep3Label;
+    var processNoCloseWindowWarningLabel, processReportButtonLabel, processGeneratingReportButtonLabel, noContactsProcessedLabel;
+    
     try
     {
+        switch(Session.getActiveUserLocale())
+        {
+            case "es":
+                titleLabel = "Generador de informes de contactos basado en grupos";
+                checkboxNameLabel = "Nombre";
+                checkboxSurnamesLabel = "Apellidos";
+                checkboxEmailsLabel = "Correos electrónicos";
+                checkboxPhonesLabel = "Tel&eacute;fonos"
+                checkboxAddressesLabel = "Direcciones"
+                checkboxGroupsLabel = "Grupos (seleccionar solamente si son necesarios)"
+                checkboxCompaniesLabel = "Compañías"
+                checkboxPositionLabel = "Cargos"
+                checkboxNotesLabel = "Notas"
+                tableGroupsLabel = "Grupos"
+                originAccountLabel = 'Cuenta origen: ' + Session.getActiveUser().getEmail()
+                processDescriptionLabel = 'Este formulario genera un informe con los contactos pertenecientes al grupo que se selecciona incluyendo únicamente los campos marcados en el formulario.';
+                processDescriptionStep1Label = "1. Seleccione los grupos que desea incluir en el informe"
+                processDescriptionStep2Label = "2. Seleccione los campos que desea mostrar para cada contacto"
+                processDescriptionStep3Label = "3. Pulse para generar el informe"
+                processNoCloseWindowWarningLabel = "La operación puede tardar varios minutos. Por favor, no cierre esta ventana o el proceso de detendrá."
+                processReportButtonLabel = "Generar Informe";
+                processGeneratingReportButtonLabel = "Generando informe..."
+                noContactsProcessedLabel = "Procesados 0 de 0 grupo(s) de contactos."
+                break;
+            default:
+                titleLabel = "Report group-based generator";
+                checkboxNameLabel = "Name";
+                checkboxSurnamesLabel = "Surnames";
+                checkboxEmailsLabel = "Emails";
+                checkboxPhonesLabel = "Phones"
+                checkboxAddressesLabel = "Addresses"
+                checkboxGroupsLabel = "Groups (select only if needed)"
+                checkboxCompaniesLabel = "Companies"
+                checkboxPositionLabel = "Positions"
+                checkboxNotesLabel = "Notes"
+                tableGroupsLabel = "Groups"
+                originAccountLabel = "Origin account: " + Session.getActiveUser().getEmail()
+                processDescriptionLabel = "This form generates a report containing the contacts from selected group incluiding only selected fields.";
+                processDescriptionStep1Label = "1. Select groups to be included."
+                processDescriptionStep2Label = "2. Select fields to be showed for each contact,"
+                processDescriptionStep3Label = "3. Press to generate the report"
+                processNoCloseWindowWarningLabel = "This operation may take several minutes. Please, don't close this windows until the process finishes."
+                processReportButtonLabel = "Create report";
+                processGeneratingReportButtonLabel = "Creating report..."
+                noContactsProcessedLabel = "0 of 0 contacts group(s) processed."
+                break;
+        }
+        
         var app = UiApp.createApplication()
-                     .setTitle("Generador de informes de contactos basado en grupos")
+                       .setTitle(titleLabel)
      
         var form = app.createFormPanel().setId('panel');
         var flow = app.createFlowPanel().setId('flowPanel');
@@ -17,70 +69,71 @@ function doGet()
         var checkBoxCompanies = app.createCheckBox()
         var checkBoxPositions = app.createCheckBox()
         var checkBoxNotes = app.createCheckBox()
-        
+      
         checkBoxName.setEnabled(true)
                     .setId("checkBoxName")
                     .setName("checkBoxName")
-                    .setTitle("Name")
                     .setVisible(true)
-                    .setValue(true).setHTML("Nombre")
+                    .setValue(true)
+                    .setHTML(checkboxNameLabel)
     
         checkBoxSurnames.setEnabled(true)
                         .setId("checkBoxSurnames")
                         .setName("checkBoxSurnames")
-                        .setTitle("Surnames")
                         .setVisible(true)
-                        .setValue(true).setHTML("Apellido")
+                        .setValue(true)
+                        .setHTML(checkboxSurnamesLabel)
     
         checkBoxEmail.setEnabled(true)
                      .setId("checkBoxEmail")
                      .setName("checkBoxEmail")
-                     .setTitle("Email")
                      .setVisible(true)
-                     .setValue(true).setHTML("Email")
+                     .setValue(true)
+                     .setHTML(checkboxEmailsLabel)
     
         checkBoxPhone.setEnabled(true)
                      .setId("checkBoxPhone")
                      .setName("checkBoxPhone")
                      .setTitle("Phone")
                      .setVisible(true)
-                     .setValue(true).setHTML("Tel&eacute;fono")
+                     .setValue(true)
+                     .setHTML(checkboxPhonesLabel)
        
         checkBoxAddress.setEnabled(true)
                        .setId("checkBoxAddress")
                        .setName("checkBoxAddress")
-                       .setTitle("Address")
                        .setVisible(true)
-                       .setValue(true).setHTML("Direcci&oacute;n")
+                       .setValue(true)
+                       .setHTML(checkboxAddressesLabel)
         
         checkBoxGroups.setEnabled(true)
                        .setId("checkBoxGroups")
                        .setName("checkBoxGroups")
-                       .setTitle("Groups")
                        .setVisible(true)
-                       .setValue(false).setHTML("Grupos (No marcar si no es completamente necesario)")
+                       .setValue(false)
+                       .setHTML(checkboxGroupsLabel)
         
-        checkBoxCompanies.setEnabled(true)
+         checkBoxCompanies.setEnabled(true)
                          .setId("checkBoxCompanies")
                          .setName("checkBoxCompanies")
                          .setTitle("Companies")
                          .setVisible(true)
-                         .setValue(false).setHTML("Empresa")
+                         .setValue(false).setHTML(checkboxCompaniesLabel)
         
         checkBoxPositions.setEnabled(true)
                          .setId("checkBoxPositions")
                          .setName("checkBoxPositions")
                          .setTitle("Position")
                          .setVisible(true)
-                         .setValue(false).setHTML("Cargo")
+                         .setValue(false).setHTML(checkboxPositionLabel)
         
         checkBoxNotes.setEnabled(true)
                      .setId("checkBoxNotes")
                      .setName("checkBoxNotes")
                      .setTitle("Notes")
                      .setVisible(true)
-                     .setValue(false).setHTML("Notas")
-        
+                     .setValue(false).setHTML(checkboxNotesLabel)
+
         var contactGroups = ContactsApp.getContactGroups()
       
         var table = app.createFlexTable().setId("groupsTable");
@@ -88,7 +141,7 @@ function doGet()
         table.setStyleAttribute("margin", "10px")
         table.setStyleAttribute("border", "1px solid black")
         table.setCellPadding(3)
-        table.setTitle("Groups")
+        table.setTitle(tableGroupsLabel)
       
         var NUMBER_OF_COLUMNS = 15;
             
@@ -106,7 +159,6 @@ function doGet()
                                       .setId("group" + contactIndex)
                                       .setName("group" + contactIndex)
               
-                  
                   var checkBoxId = app.createTextBox()
                                         .setValue(group.getId())
                                         .setId("group_"+ contactIndex +"_id")
@@ -127,18 +179,18 @@ function doGet()
                                        .setVisible(false)
         
     
-        flow.setTitle('Generador de informes de contactos basado en grupos.');
+        flow.setTitle(titleLabel);
         
-        flow.add(app.createLabel('Este formulario genera un informe con los contactos pertenecientes al grupo que se selecciona incluyendo únicamente los campos marcados en el formulario.')
+        flow.add(app.createLabel(processDescriptionLabel)
                  .setStyleAttributes({fontSize : "20px", fontWeight : "bold", margin: "10px"}));
         
-        flow.add(app.createLabel('Cuenta origen: ' + Session.getActiveUser().getEmail()).setStyleAttributes({fontWeight : "bold", margin: "10px"}));
+        flow.add(app.createLabel(originAccountLabel).setStyleAttributes({fontWeight : "bold", margin: "10px"}));
     
-        flow.add(app.createLabel("1. Seleccione los grupos que desea incluir en el informe").setStyleAttributes({fontWeight : "bold", margin: "10px"}))
+        flow.add(app.createLabel(processDescriptionStep1Label).setStyleAttributes({fontWeight : "bold", margin: "10px"}))
         
         flow.add(table)
     
-        flow.add(app.createLabel("2. Seleccione los campos que desea mostrar para cada contacto").setStyleAttributes({fontWeight : "bold", margin: "10px"}))
+        flow.add(app.createLabel(processDescriptionStep2Label).setStyleAttributes({fontWeight : "bold", margin: "10px"}))
     
         var fieldsTable = app.createFlexTable().setId("fieldsTable");
     
@@ -168,34 +220,30 @@ function doGet()
       
         flow.add(numberOfGroupsTextBox);
             
-        flow.add(app.createLabel("3. Pulse para generar el informe").setStyleAttributes({fontWeight : "bold", margin: "10px"}))
+        flow.add(app.createLabel(processDescriptionStep3Label).setStyleAttributes({fontWeight : "bold", margin: "10px"}))
     
-        var infoLabel = app.createLabel("La operación puede tardar varios minutos. Por favor, no cierre esta ventana o el proceso de detendrá.").setVisible(false).setStyleAttributes({fontWeight : "bold", margin: "10px"})
+        var infoLabel = app.createLabel(processNoCloseWindowWarningLabel).setVisible(false).setStyleAttributes({fontWeight : "bold", margin: "10px"})
         
         var submitLabelChangeHandler = app.createClientHandler()
-                                          .forEventSource().setHTML("Generando informe...")
+                                          .forEventSource().setHTML(processGeneratingReportButtonLabel)
                                           .forTargets(infoLabel).setVisible(true)
         
         var handlerSubmit = app.createServerHandler('prepareData').addCallbackElement(flow);
-        flow.add(app.createButton("Generar Informe",handlerSubmit).setId("submitButton").setStyleAttributes({fontWeight : "bold", margin: "10px"}).addClickHandler(submitLabelChangeHandler));
+        flow.add(app.createButton(processReportButtonLabel, handlerSubmit).setId("submitButton").setStyleAttributes({fontWeight : "bold", margin: "10px"}).addClickHandler(submitLabelChangeHandler));
     
         flow.add(infoLabel)
-        flow.add(app.createLabel("Procesados 0 de 0 grupo(s) de contactos.").setId("remainingGroups").setVisible(false).setStyleAttributes({fontWeight : "bold", margin: "10px"}))
-    
+        flow.add(app.createLabel(noContactsProcessedLabel).setId("remainingGroups").setVisible(false).setStyleAttributes({fontWeight : "bold", margin: "10px"}))
+  
         form.add(flow);
     
         app.add(form);
-    
-        Logger.log("Creado spreadsheet dentro de la carpeta")
-
     }
     catch(e)
     {
         GmailApp.sendEmail( "carlos.delgado@proyecti.es,antonio.acevedo@proyecti.es", 
                             "Error - Informe sobre contactos", 
                             "Error generando informe de contactos:" + JSON.stringify(e));
-        
-        Logger.log("Error encontrado: ", JSON.stringify(e));
+
         return showReportGenerationResult(app, false)
     }
     
@@ -220,10 +268,21 @@ function prepareData(eventInfo)
             requiredGroupsIds.push(eventInfo.parameter["group_"+i+"_id"])
         }
     }
-
+    
+    var remainingGroupsLabel;
     var spreadSheetFile = createTemporalSpreadSheet();
     app.getElementById("spreadSheetFileIdTextBox").setValue(spreadSheetFile.getId())
 
+    switch(Session.getActiveUserLocale())
+    {
+            case "es":
+                remainingGroupsLabel = "Procesados 0 de " + requiredGroupsIds.length + " grupo(s) de contactos."
+                break;
+            default:
+                remainingGroupsLabel = "0 of " + requiredGroupsIds.length + " contacts group(s) processed."
+                break;
+    }
+   
     //I. Meter un checkbox que tenga un handler que llame a la funcion de procesar un grupo
     var flowPanel = app.getElementById("flowPanel")
     var processGroupHandler = app.createServerHandler('processGroup').addCallbackElement(flowPanel);
@@ -237,7 +296,7 @@ function prepareData(eventInfo)
     flowPanel.add(loopCheckbox)
     flowPanel.add(requiredGroupsIdsTextBox)
 
-    app.getElementById("remainingGroups").setVisible(true).setText("Procesados 0 de " + requiredGroupsIds.length + " grupo(s) de contactos.");
+    app.getElementById("remainingGroups").setVisible(true).setText(remainingGroupsLabel);
 
     //II. Lanzamos el bucle
     
@@ -266,6 +325,58 @@ function processGroup(eventInfo)
         var requiredGroupsIds = JSON.parse(eventInfo.parameter.requiredGroupsIdsTextBox)
         var numberOfSelectedGroups = eventInfo.parameter.numberOfSelectedGroups
 
+        var nameHeader, surnamesHeader, email1Header, email2Header, phone1Header, phone2Header, phone3Header, phone4Header, address1Header, address2Header, groupsHeader, company1Header, company2Header, position1Header, position2Header, notesHeader;
+        var numberOfProcessedGroupsLabel, newFileNamePrefix, subjectEmail, bodyEmailPrefix
+        
+        switch(Session.getActiveUserLocale())
+        {
+            case "es":
+                nameHeader = "Nombre"
+                surnamesHeader = "Apellidos"
+                email1Header = "Correo electrónico 1"
+                email2Header = "Correo electrónico 2"
+                phone1Header = "Teléfono 1"
+                phone2Header = "Teléfono 2"
+                phone3Header = "Teléfono 3"
+                phone4Header = "Teléfono 4"
+                address1Header = "Dirección 1"
+                address2Header = "Dirección 2"
+                groupsHeader = "Grupos"
+                company1Header = "Compañía 1"
+                company2Header = "Compañía 2"
+                position1Header = "Position 1"
+                position2Header = "Position 2"
+                notesHeader = "Notas"
+                numberOfProcessedGroupsLabel = "Procesados " + (numberOfSelectedGroups-requiredGroupsIds.length) + " de " + numberOfSelectedGroups + " grupo(s) de contactos."
+                newFileNamePrefix = "Informe de contactos"
+                subjectEmail = "Informe generado - contactos por grupo";
+                bodyEmailPrefix = "Informe de contactos generado satisfactoriamente. Para acceder al mismo pinche sobre el siguiente link: ";
+                break;
+                
+            default:
+                nameHeader = "Name"
+                surnamesHeader = "Surnames"
+                email1Header = "Email 1"
+                email2Header = "Email 2"
+                phone1Header = "Phone 1"
+                phone2Header = "Phone 2"
+                phone3Header = "Phone 3"
+                phone4Header = "Phone 4"
+                address1Header = "Address 1"
+                address2Header = "Address 2"
+                company1Header = "Company 1"
+                company2Header = "Company 2"
+                position1Header = "Position 1"
+                position2Header = "Position 2"
+                notesHeader = "Notes"
+                groupsHeader = "Group(s)"
+                numberOfProcessedGroupsLabel = (numberOfSelectedGroups-requiredGroupsIds.length) + " of " + numberOfSelectedGroups + " contacts group(s) processed."
+                newFileNamePrefix = "Contacts report"
+                subjectEmail = "Report created - Contacts per group";
+                bodyEmailPrefix = "Contacts per group report created successfully. It can be accessed through the following link: ";
+                break;
+        }
+        
         //Save the data into the spreadsheet
         var spreadSheet =  SpreadsheetApp.openById(spreadSheetFileId);
     
@@ -288,21 +399,21 @@ function processGroup(eventInfo)
         if(needName)
         {
             contactInfoTemplate.push('')
-            headers.push("Nombre")
+            headers.push(nameHeader)
         }
           
         if(needSurnames)
         {
             contactInfoTemplate.push('')
-            headers.push("Apellidos")
+            headers.push(surnamesHeader)
         }
         
          if(needEmails)
         {
             contactInfoTemplate.push('')
             contactInfoTemplate.push('')
-            headers.push("Email 1")
-            headers.push("Email 2")
+            headers.push(email1Header)
+            headers.push(email2Header)
         }
           
         if(needPhones)
@@ -311,26 +422,26 @@ function processGroup(eventInfo)
             contactInfoTemplate.push('')
             contactInfoTemplate.push('')
             contactInfoTemplate.push('')
-            headers.push("Teléfono 1")
-            headers.push("Teléfono 2")
-            headers.push("Teléfono 3")
-            headers.push("Teléfono 4")
+            headers.push(phone1Header)
+            headers.push(phone2Header)
+            headers.push(phone3Header)
+            headers.push(phone4Header)
         }
           
         if(needAddresses)
         {
             contactInfoTemplate.push('')
             contactInfoTemplate.push('')
-            headers.push("Dirección 1")
-            headers.push("Dirección 2")
+            headers.push(address1Header)
+            headers.push(address2Header)
         }
         
         if(needCompanies && !needPositions)
         {
             contactInfoTemplate.push('')
             contactInfoTemplate.push('')
-            headers.push("Empresa 1")
-            headers.push("Empresa 2")
+            headers.push(company1Header)
+            headers.push(company2Header)
         }
         else if(needCompanies && needPositions)
         {
@@ -338,29 +449,29 @@ function processGroup(eventInfo)
             contactInfoTemplate.push('')
             contactInfoTemplate.push('')
             contactInfoTemplate.push('')
-            headers.push("Empresa 1")
-            headers.push("Cargo 1")
-            headers.push("Empresa 1")
-            headers.push("Cargo 2")
+            headers.push(company1Header)
+            headers.push(position1Header)
+            headers.push(company2Header)
+            headers.push(position2Header)
         }
         else if(needPositions)
         {
             contactInfoTemplate.push('')
             contactInfoTemplate.push('')
-            headers.push("Cargo 1")
-            headers.push("Cargo 2")
+            headers.push(position1Header)
+            headers.push(position2Header)
         }
         
         if(needGroups)
         {
             contactInfoTemplate.push('')
-            headers.push("Grupo/s")
+            headers.push(groupsHeader)
         }
-      
+        
         if(needNotes)
         {
             contactInfoTemplate.push('')
-            headers.push("Notas")
+            headers.push(notesHeader)
         }
         
         var allContactsInfo = []
@@ -383,7 +494,10 @@ function processGroup(eventInfo)
         headerRowsFileNumber.push(sheet.getLastRow() + allContactsInfo.length)
                 
         allContactsInfo.push(contactInfoTemplate.slice(0))
-    
+                
+        var numberOfContactsInGroup = contacts.length;
+        
+        //IV. Iterate over each group contact
         //IV. Iterate over each group contact
         for (var j=0; j < contacts.length; j++) 
         {
@@ -600,7 +714,7 @@ function processGroup(eventInfo)
     
         var numberOfGroups = eventInfo.parameter.numberOfGroupsTextBox
     
-        app.getElementById("remainingGroups").setVisible(true).setText("Procesados " + (numberOfSelectedGroups-requiredGroupsIds.length) + " de " + numberOfSelectedGroups + " grupo(s) de contactos.");
+        app.getElementById("remainingGroups").setVisible(true).setText(numberOfProcessedGroupsLabel);
         app.getElementById('loopCheckbox').setValue(false,false)
         app.getElementById('loopCheckbox').setValue(true,true)
         
@@ -609,35 +723,60 @@ function processGroup(eventInfo)
     catch(e)
     {
         GmailApp.sendEmail( "carlos.delgado@proyecti.es,antonio.acevedo@proyecti.es", 
-                            "Error - Informe sobre contactos", 
-                           "Error generando informe de contactos:" + JSON.stringify(e));
+                            "Error - Contacts report", 
+                           "Error generating contacts report:" + JSON.stringify(e));
         
-        Logger.log("Error encontrado: ", JSON.stringify(e));
         return showReportGenerationResult(app, false)
     }
 }
+
 
 function showReportGenerationResult(app, success, spreadSheetUrl)
 {
     var form = app.createFormPanel().setId('panel');
     var flow = app.createFlowPanel();
   
-    flow.setTitle('Generador de informes de contactos basado en grupos.');
+    var flowTitle, correctReportLabel, correctReportLinkLabel, correctReportLink, correctReportEmailSentLabel, errorReportLabel, errorReportSupportLabel
+    
+    switch(Session.getActiveUserLocale())
+    {
+        case "es":
+            flowTitle = 'Generador de informes de contactos basado en grupos.'
+            correctReportLabel = 'Informe generado correctamente.'
+            correctReportLinkLabel = 'Puede acceder al informe desde el siguiente enlace:'
+            correctReportLink = "Acceder al informe"
+            correctReportEmailSentLabel = 'Adicionalmente se ha enviado a su bandeja de entrada un correo para consultas posteriores'
+            errorReportLabel = 'El informe no ha podido ser generado.'
+            errorReportSupportLabel = 'Se ha enviado un correo informando de la incidencia al responsable técnico para solucionarlo a la mayor brevedad posible. Disculpen las molestias'
+            break;
+        
+        default:
+            flowTitle = 'Generador de informes de contactos basado en grupos.'
+            correctReportLabel = 'Report created successfully.'
+            correctReportLinkLabel = 'It can be accessed throught the following link:'
+            correctReportLink = "Access to the report"
+            correctReportEmailSentLabel = 'In addition, an email has been sent to your inbox containing this link'
+            errorReportLabel = 'The report cannot be created'
+            errorReportSupportLabel = 'An email has been sent to support team with the incidence. It will be fixed as soon as possible. Sorry for the inconvenience'
+            break;
+    }
+
+    flow.setTitle(flowTitle);
     
     if(success)
     {
-        flow.add(app.createLabel('Informe generado correctamente.').setStyleAttributes({fontSize : "20px", fontWeight : "bold", margin: "10px"}));
+        flow.add(app.createLabel(correctReportLabel).setStyleAttributes({fontSize : "20px", fontWeight : "bold", margin: "10px"}));
     
-        flow.add(app.createInlineLabel('Puede acceder al informe desde el siguiente enlace:').setStyleAttributes({margin: "10px"}));
-        flow.add(app.createAnchor("Acceder al informe", spreadSheetUrl).setStyleAttributes({margin: "10px"}));
+        flow.add(app.createInlineLabel(correctReportLinkLabel).setStyleAttributes({margin: "10px"}));
+        flow.add(app.createAnchor(correctReportLink, spreadSheetUrl).setStyleAttributes({margin: "10px"}));
 
-        flow.add(app.createLabel('Adicionalmente se ha enviado a su bandeja de entrada un correo para consultas posteriores').setStyleAttributes({margin: "10px"}));
+        flow.add(app.createLabel(correctReportEmailSentLabel).setStyleAttributes({margin: "10px"}));
     }
     else
     {
-        flow.add(app.createLabel('El informe no ha podido ser generado.').setStyleAttributes({fontSize : "20px", fontWeight : "bold", margin: "10px"}));
+        flow.add(app.createLabel(errorReportLabel).setStyleAttributes({fontSize : "20px", fontWeight : "bold", margin: "10px"}));
     
-        flow.add(app.createInlineLabel('Se ha enviado un correo informando de la incidencia al responsable técnico para solucionarlo a la mayor brevedad posible. Disculpen las molestias').setStyleAttributes({margin: "10px"}));  
+        flow.add(app.createInlineLabel(errorReportSupportLabel).setStyleAttributes({margin: "10px"}));  
     }
     
     form.add(flow);
@@ -647,11 +786,22 @@ function showReportGenerationResult(app, success, spreadSheetUrl)
     return app;
 }
 
+
 function createTemporalSpreadSheet()
 {
     var folder = getReportsTemporalFolder();
+    var temporalName;
   
-    var temporalName = "Informe de contactos (" + new Date() + ")";
+    switch(Session.getActiveUserLocale())
+    {
+        case "es":
+            temporalname = "Informe de contactos (" + new Date() + ")";
+            break;
+        default:
+            temporalname = "Contacts report (" + new Date() + ")";
+            break;
+    }
+    
     var temporalSpreadSheet
     
     try
@@ -672,7 +822,20 @@ function createTemporalSpreadSheet()
 
 function getReportsFolder()
 {
-    var folders = DriveApp.getFoldersByName('informes-contactos');
+    var folderName;
+    var tmpFolderName = "tmp";
+    
+    switch(Session.getActiveUserLocale())
+    {
+        case "es":
+            folderName = "informes-contactos";
+            break;
+        default:
+            folderName = "contacts-report";
+            break;
+    }
+    
+    var folders = DriveApp.getFoldersByName(folderName);
     var folder;
 
     while (folders.hasNext()) 
@@ -682,17 +845,19 @@ function getReportsFolder()
 
     if(folder == null)
     {
-        folder = DriveApp.createFolder("informes-contactos");
-        folder.createFolder("tmp")
+        folder = DriveApp.createFolder(folderName);
+        folder.createFolder(tmpFolderName)
     }
     return folder;
 }
 
 function getReportsTemporalFolder()
 {
+    var tmpFolderName = "tmp";
+
     var reportFolder = getReportsFolder()
     
-    var folders = reportFolder.getFoldersByName("tmp");
+    var folders = reportFolder.getFoldersByName(tmpFolderName);
     var temporalFolder;
     
     while(folders.hasNext())
@@ -705,23 +870,55 @@ function getReportsTemporalFolder()
 
 function prepareFinalSpreadSheet(spreadSheet)
 {
-    var app = UiApp.getActiveApplication()
+    var reportName, correctReportSubject, correctReportBody, correctReportLink
+    switch(Session.getActiveUserLocale())
+    {
+        case "es":
+            reportName = "Informe de contactos (" + new Date() + ")"
+            correctReportSubject = "Informe de contactos por grupo generado"
+            correctReportBody = 'Informe de contactos por grupo generado satisfactoriamente.'
+            correctReportLink = "Acceder al informe"
+            break;
+        
+        default:
+            reportName = "Informe de contactos (" + new Date() + ")"
+            correctReportSubject = "Contacts report generated"
+            correctReportBody = 'Report created successfully.'
+            correctReportLink = "Access to the report"
+            break;
+    }
+
+
     var file = DriveApp.getFileById(spreadSheet.getId())
     
-    var newFile = file.makeCopy(file.getName(), getReportsFolder())
+    var newFile = file.makeCopy(reportName, getReportsFolder())
     
     file.setTrashed(true);
- 
-    var body = "Informe de contactos por grupo generado satisfactoriamente. <br /> <a href='" + newFile.getUrl() + "'>Acceder al informe</a>";
-     
-    GmailApp.sendEmail(Session.getActiveUser().getEmail(), "Informe de contactos por grupo generado", "", { htmlBody : body} )
     
-    return showReportGenerationResult(app, true, newFile.getUrl())
+    var body = correctReportBody + "<br /> <a href='" + newFile.getUrl() + "'>" + correctReportLink + "</a>";
+     
+    GmailApp.sendEmail(Session.getActiveUser().getEmail(), correctReportSubject, "", { htmlBody : body} )
+    
+    return showReportGenerationResult(UiApp.getActiveApplication(), true, newFile.getUrl())
 }
 
 function getSpreadSheetTemplate(fileName)
 {
-    var folders = DriveApp.getRootFolder().getFoldersByName("automatizaciones-NO TOCAR")
+    var automationsFolderName, contactsScriptFolder, contactsSpreadSheetTemplateName = "template";
+    
+    switch(Session.getActiveUserLocale())
+    {
+        case "es":
+            automationsFolderName = "automatizaciones-NO TOCAR";
+            contactsScriptFolder = "Informe de contactos por grupo"
+            break;
+        default:
+            automationsFolderName = "automations-NOT TOUCH";
+            contactsScriptFolder = "Groups report"
+            break;
+    }
+    
+    var folders = DriveApp.getRootFolder().getFoldersByName(automationsFolderName)
     
     var automationsFolder
     
@@ -730,7 +927,12 @@ function getSpreadSheetTemplate(fileName)
         automationsFolder = folders.next()
     }
     
-    var infolders = automationsFolder.getFoldersByName("Informe de contactos por grupo");
+    if(automationsFolder == null)
+    {
+        automationsFolder = DriveApp.getRootFolder().createFolder(automationsFolderName)
+    }
+    
+    var infolders = automationsFolder.getFoldersByName(contactsScriptFolder);
 
     var templatesFolder;
 
@@ -739,7 +941,23 @@ function getSpreadSheetTemplate(fileName)
         templatesFolder = infolders.next()
     }
 
-    var contactsPerGroupReportSpreadsheetTemplate;
+    var spreadSheetTemplate;
+    
+    if(templatesFolder == null)
+    {
+        templatesFolder = automationsFolder.createFolder(contactsScriptFolder)
+        spreadSheetTemplate = SpreadsheetApp.create(contactsSpreadSheetTemplateName);
+        var temporalFile = DriveApp.getFileById(spreadSheetTemplate.getId());
 
-    return templatesFolder.getFilesByName("template").next().makeCopy(fileName, getReportsTemporalFolder())
+        var file = temporalFile.makeCopy("template",templatesFolder);
+        DriveApp.getRootFolder().removeFile(temporalFile);
+        return spreadSheetTemplate; 
+    }
+    else
+    {
+        spreadSheetTemplate = templatesFolder.getFilesByName(contactsSpreadSheetTemplateName).next()
+    }
+    
+    return temporalSpreadSheet = spreadSheetTemplate.makeCopy(fileName, getReportsTemporalFolder())
 }
+//http://stackoverflow.com/questions/19408464/apps-script-oauth2-youtube-api-v3
